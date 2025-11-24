@@ -44,15 +44,32 @@ function KioskScreen() {
   ];
 
   const checkQuizCorrect = () => {
-    if (selectedItems.length !== quizAnswerList.length) return false;
-    const sortedUser = [...selectedItems].sort((a, b) => a.name.localeCompare(b.name));
-    const sortedAns = [...quizAnswerList].sort((a, b) => a.name.localeCompare(b.name));
-    for (let i = 0; i < sortedAns.length; i++) {
-      if (sortedUser[i].name !== sortedAns[i].name) return false;
-      if (sortedUser[i].price !== sortedAns[i].price) return false;
-    }
-    return true;
+  // 메뉴별 정답 수량
+  const answerCount = {
+    '아메리카노': 2,
+    '마카롱': 3,
+    '레몬에이드': 1
   };
+
+  // 장바구니에서 메뉴별 수량 계산
+  const userCount = {};
+  selectedItems.forEach(item => {
+    userCount[item.name] = (userCount[item.name] || 0) + item.quantity;
+  });
+
+  // 정답 비교
+  for (const [name, qty] of Object.entries(answerCount)) {
+    if (userCount[name] !== qty) return false;
+  }
+
+  // 추가로 장바구니에 다른 메뉴가 있으면 틀림
+  for (const name of Object.keys(userCount)) {
+    if (!answerCount[name]) return false;
+  }
+
+  return true;
+};
+
 
   const infoSteps = [
     { text: "여기는 카테고리 영역입니다!", highlight: ".category-buttons", arrow: { top: "270px", left: "50%" } },
